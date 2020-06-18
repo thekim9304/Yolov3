@@ -32,10 +32,18 @@ def main():
 
     optimizer = tf.keras.optimizers.Adam(lr=lr_rate)
 
+    lowest_loss = 10000000
     for epoch in range(EPOCH):
         print('{} epoch start! : {}'.format(epoch, datetime.datetime.now().strftime("%Y.%m.%d %H:%M:%S")))
 
-        train_one_epoch(model, loss_objects, preprocessor(), optimizer)
+        epoch_loss = train_one_epoch(model, loss_objects, preprocessor(), optimizer)
+
+        if lowest_loss > epoch_loss:
+            lowest_loss = epoch_loss
+
+            save_path = ckpt_dir + '/cp-{:04d}-{:.4f}.ckpt'.format(epoch, lowest_loss)
+            model.save_weights(save_path)
+            print('Save CKPT _ [loss : {:.4f}, save_path : {}]\n'.format(lowest_loss, save_path))
 
 
 def train_one_epoch(model, loss_objects, generator, optimizer):
@@ -85,6 +93,7 @@ def train_one_epoch(model, loss_objects, generator, optimizer):
                                                                        epoch_class_loss / batchs,
                                                                        epoch_obj_loss / batchs))
 
+    return epoch_total_loss
 
 if __name__ == '__main__':
     main()
