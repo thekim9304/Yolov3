@@ -1,4 +1,5 @@
 import cv2
+import time
 import tensorflow as tf
 
 from utils.postprocess import Postprocessor
@@ -24,6 +25,7 @@ def main():
     # Postprocessor object
     postprocessor = Postprocessor(0.5, 0.5, 2)
 
+    prevTime = time.time()
     # Predict
     y_pred = model(x)
 
@@ -46,6 +48,11 @@ def main():
             ymax = int(box[3] * h)
 
             img = cv2.rectangle(img, (xmin, ymin), (xmax, ymax), (0, 0, 255), 2)
+
+    curTime = time.time()
+    sec = curTime - prevTime
+    fps = 1/(sec)
+    print(fps)
 
     cv2.imshow('t', img)
     cv2.waitKey()
